@@ -1,135 +1,106 @@
-<html lang="en">
-
+<!DOCTYPE html>
+<html lang="sv">
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <title>Ordkonst</title>
-
-    <link rel="stylesheet" href="style.css">
-
-
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css">
-
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-    <link href="https://fonts.googleapis.com/css?family=EB+Garamond|Literata|Roboto+Slab&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css?family=Lato|Montserrat|Cardoo&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed&display=swap" rel="stylesheet">
-
-    <link rel="icon" type="image/jpg" href="ordkonstfav.jpg">
-
+  <meta charset="UTF-8">
+  <title>Tidskrift Demo</title>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 </head>
-
 <body>
+  <h1>Redaktörsinloggning</h1>
 
-    <div class="header_wrapper flex">
-    <div class="header_logo_container"></div>
-    <div class="header_spacer"></div>
-    <div class="header_menu_container flex">
-        <div class="header_menuItem" id="menuItem1">Tidskrift</div>
-        <div class="header_menuItem" id="menuItem5">Läs Texter</div>
-        <div class="header_menuItem" id="menuItem6">Cirklar</div>
-    </div>
-</div>
+  <div id="login">
+    <input type="email" id="email" placeholder="E-post">
+    <input type="password" id="password" placeholder="Lösenord">
+    <button onclick="login()">Logga in</button>
+    <button onclick="signup()">Registrera</button>
+  </div>
 
-    <span class="home_slider_container"></span>
+  <div id="dashboard" style="display: none;">
+    <h2>Publicera ny text</h2>
+    <textarea id="postContent" placeholder="Skriv din text här..." rows="5" cols="40"></textarea><br>
+    <button onclick="submitPost()">Publicera</button>
 
-    <div class="pageContent">
+    <h3>Publicerade texter</h3>
+    <div id="posts"></div>
 
-        <section id="home_text_sec1">
-    <div class="home_text_container flex" id="home_text_container1">
+    <button onclick="logout()">Logga ut</button>
+  </div>
 
-        <div class="home_text_box flex" id="home_text_box00" data-aos="fade-down" data-aos-delay="100"></div>
+  <script>
+    // 🔑 Fyll i din Firebase-konfiguration här (från Firebase Console)
+    const firebaseConfig = {
+      apiKey: "DIN_API_KEY",
+      authDomain: "DITT_PROJECT.firebaseapp.com",
+      projectId: "DITT_PROJECT",
+      storageBucket: "DITT_PROJECT.appspot.com",
+      messagingSenderId: "XXXXXXXXX",
+      appId: "DIN_APP_ID"
+    };
 
-        <div class="home_text_box flex" id="home_text_box01" data-aos="fade-down" data-aos-delay="200"></div>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        <div class="home_text_box flex" id="home_text_box02" data-aos="fade-down" data-aos-delay="300"></div>
+    // 🟢 Inloggning
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(e => alert("Fel: " + e.message));
+    }
 
-    </div>
-</section>
+    // 🆕 Registrera ny redaktör
+    function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .catch(e => alert("Fel: " + e.message));
+    }
 
+    // 📝 Publicera text
+    function submitPost() {
+      const text = document.getElementById("postContent").value;
+      db.collection("posts").add({
+        content: text,
+        timestamp: Date.now()
+      });
+      document.getElementById("postContent").value = "";
+    }
 
-<section id=spacer1>
-    <div class="spacer"></div>
-    <div class="spacerContent"></div>
-    <div class="spacer"></div>
-</section>
+    // 🔄 Visa texter
+    function loadPosts() {
+      const postDiv = document.getElementById("posts");
+      db.collection("posts").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        postDiv.innerHTML = "";
+        snapshot.forEach(doc => {
+          const p = document.createElement("p");
+          p.textContent = doc.data().content;
+          postDiv.appendChild(p);
+        });
+      });
+    }
 
+    // 🔒 Logga ut
+    function logout() {
+      auth.signOut();
+    }
 
-
-<section id="home_text_sec2">
-    <div class="home_text_container flex" id="home_text_container2">
-
-        <div class="home_text_box flex" id="home_text_box10" data-aos="fade-down" data-aos-delay="100"></div>
-
-        <div class="home_text_box flex" id="home_text_box11" data-aos="fade-down" data-aos-delay="200"></div>
-
-        <div class="home_text_box flex" id="home_text_box12" data-aos="fade-down" data-aos-delay="300"></div>
-
-    </div>
-</section>
-
-
-
-<section id=spacer2>
-    <div class="spacer"></div>
-    <div class="spacerContent"></div>
-    <div class="spacer"></div>
-</section>
-
-
-
-<section id="home_text_sec3">
-    <div class="home_text_container flex" id="home_text_container3">
-
-        <div class="home_text_box flex" id="home_text_box20" data-aos="fade-down" data-aos-delay="100"></div>
-
-        <div class="home_text_box flex" id="home_text_box21" data-aos="fade-down" data-aos-delay="200"></div>
-
-        <div class="home_text_box flex" id="home_text_box22" data-aos="fade-down" data-aos-delay="300"></div>
-
-    </div>
-</section>
-
-    </div>
-
-    <div class="footer_wrapper">
-
-    <span class="login_box">
-        <div class="loginButton"></div>
-    </span>
-
-</div>
-
-<div style="display:flex; flex-direction:row; margin: 3vw;">
-
-    <img style="height:5vw; margin-right: 3vw;" src="https://uploads-ssl.webflow.com/5acb7cb673ab450b8bf8d01e/5ad788b7e6f07466051b52d6_lx-montezuma-affisch-final-utantextur.png">
-
-    <img style="height:5vw;" src="http://www.alliancefrancaise-ostersund.eu/wp-content/uploads/2018/04/Folkuniversitetet-1.jpg">
-
-</div>
-
-    <script src="jquery-3.4.1.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            once: true
-        })
-
-    </script>
-    <script src="script.js"></script>
-    <script src="./path-to-js/moby.min.js"></script>
-
+    // 👤 Visa rätt vy beroende på inloggning
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        loadPosts();
+      } else {
+        document.getElementById("login").style.display = "block";
+        document.getElementById("dashboard").style.display = "none";
+      }
+    });
+  </script>
 </body>
+</html>
 
 </html>
 
