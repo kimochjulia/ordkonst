@@ -2,109 +2,140 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Tidskrift Demo</title>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OrdKonst – Tidskrift för litteratur</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Georgia", serif;
+      background-color: #fafafa;
+      color: #111;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 2rem 1rem;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: normal;
+    }
+
+    nav {
+      margin-top: 1rem;
+    }
+
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #444;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .intro {
+      margin-bottom: 2rem;
+    }
+
+    .articles {
+      list-style: none;
+      padding: 0;
+    }
+
+    .articles li {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .articles h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.2rem;
+    }
+
+    .articles a {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .articles a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 2rem 1rem;
+      color: #666;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      nav a {
+        display: block;
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Redaktörsinloggning</h1>
 
-  <div id="login">
-    <input type="email" id="email" placeholder="E-post">
-    <input type="password" id="password" placeholder="Lösenord">
-    <button onclick="login()">Logga in</button>
-    <button onclick="signup()">Registrera</button>
-  </div>
+  <header>
+    <h1>OrdKonst</h1>
+    <nav>
+      <a href="#">Hem</a>
+      <a href="#">Texter</a>
+      <a href="#">Om oss</a>
+      <a href="#">Kontakt</a>
+    </nav>
+  </header>
 
-  <div id="dashboard" style="display: none;">
-    <h2>Publicera ny text</h2>
-    <textarea id="postContent" placeholder="Skriv din text här..." rows="5" cols="40"></textarea><br>
-    <button onclick="submitPost()">Publicera</button>
+  <main class="container">
+    <section class="intro">
+      <p><strong>OrdKonst</strong> är en oberoende litteraturtidskrift som utforskar samtida poesi, kritik och konstnärliga uttryck. Här samlas texter, samtal och teman i tryck och digital form.</p>
+    </section>
 
-    <h3>Publicerade texter</h3>
-    <div id="posts"></div>
+    <section>
+      <h2>Senaste nummer</h2>
+      <ul class="articles">
+        <li>
+          <h3><a href="#">Nummer 3 – Tema: Tystnad</a></h3>
+          <p>Med bidrag av Elin Högberg, Amara Drammeh, Jonathan Berg. En utforskning av det outsagda.</p>
+        </li>
+        <li>
+          <h3><a href="#">Nummer 2 – Tema: Kropp</a></h3>
+          <p>Texter om kropp, gränser, närvaro och frånvaro. Med illustrationer av Lovisa Ringborg.</p>
+        </li>
+        <li>
+          <h3><a href="#">Nummer 1 – Tema: Ursprung</a></h3>
+          <p>Debutnummer med texter av redaktionen och inbjudna gäster.</p>
+        </li>
+      </ul>
+    </section>
+  </main>
 
-    <button onclick="logout()">Logga ut</button>
-  </div>
+  <footer>
+    &copy; 2025 OrdKonst – En litterär tidskrift. | <a href="mailto:redaktion@ordkonst.nu">redaktion@ordkonst.nu</a>
+  </footer>
 
-  <script>
-   
-    
-    
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // 🟢 Inloggning
-    function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(e => alert("Fel: " + e.message));
-    }
-
-    // 🆕 Registrera ny redaktör
-    function signup() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .catch(e => alert("Fel: " + e.message));
-    }
-
-    // 📝 Publicera text
-    function submitPost() {
-      const text = document.getElementById("postContent").value;
-      db.collection("posts").add({
-        content: text,
-        timestamp: Date.now()
-      });
-      document.getElementById("postContent").value = "";
-    }
-
-    // 🔄 Visa texter
-    function loadPosts() {
-      const postDiv = document.getElementById("posts");
-      db.collection("posts").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-        postDiv.innerHTML = "";
-        snapshot.forEach(doc => {
-          const p = document.createElement("p");
-          p.textContent = doc.data().content;
-          postDiv.appendChild(p);
-        });
-      });
-    }
-
-    // 🔒 Logga ut
-    function logout() {
-      auth.signOut();
-    }
-
-    // 👤 Visa rätt vy beroende på inloggning
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
-        loadPosts();
-      } else {
-        document.getElementById("login").style.display = "block";
-        document.getElementById("dashboard").style.display = "none";
-      }
-    });
-  </script>
 </body>
 </html>
 
-</html>
 
